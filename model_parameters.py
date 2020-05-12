@@ -3,8 +3,8 @@ from math import pi
 
 # Parameters
 from control.matlab import ss, c2d, ssdata, lqr, lqe
-from numpy import eye, np
-from numpy.matlib import zeros
+import numpy as np
+from numpy import eye, zeros
 
 g = 9.81                            # gravity
 m = 0.023  # 0.023                  # wheel mass 0.038
@@ -88,9 +88,9 @@ Rn = np.array([[VarEnc, 0],
 
 # LQR control
 
-A_bar = np.array([[A, zeros(4, 1)],
-                  [1, 0, 0, 0, 0]])
-B_bar = np.array([B, [0, 0]])
+A_bar = np.vstack((np.concatenate((A, zeros((4, 1))), axis=1),
+                       np.array([1, 0, 0, 0, 0])))
+B_bar = np.vstack((B, [0, 0]))
 Q1 = np.array([[1, 0, 0, 0, 0],
                [0, 1, 0, 0, 0],
                [0, 0, 1, 0, 0],
@@ -100,18 +100,17 @@ P1 = 100. * eye(2)
 sys = ss(A, B, C, DD)
 sysd = c2d(sys, Ts, 'zoh')
 Ad, Bd, Cd, Dd = ssdata(sysd)
-[Kd, Sd, Ed] = lqr(A_bar, B_bar, Q1, P1)
-Kx = Kd[0, 0:3]  # Kd(1, 1:4)
+Kd, Sd, Ed = lqr(A_bar, B_bar, Q1, P1)
+Kx = Kd[0, 0:4]  # Kd(1, 1:4)
 Ki = Kd[0, 4]
 Kx[0, 2] = Kx[0, 2] * 0.8
 
 # Kalman Filter
 
-C1 = [[1, 0, 0, 0],
-      [0, 0, 0, 1]]
-
-sys2 = ss(A, [B, Dw], C1, zeros(2, 4))
+C1 = np.array([[1, 0, 0, 0],
+               [0, 0, 0, 1]])
+sys2 = ss(A, np.hstack((B, Dw)), C1, zeros((2, 4)))
 sysd2 = c2d(sys2, Ts, 'zoh')
-KESTD, Lk, Pk = lqe(sys2, Qn, Rn, None, None)  # matlab version used 'delayed' estimator, here we use default provided by `python-control`
-KESTD = c2d(KESTD, Ts, 'zoh')
-Ak, Bk, Ck, Dk = ssdata(KESTD)
+# KESTD, Lk, Pk = lqe(sys2.A, None, sys2.C, Qn, Rn)  # matlab version used 'delayed' estimator, here we use default provided by `python-control`
+# KESTD = c2d(KESTD, Ts, 'zoh')
+# Ak, Bk, Ck, Dk = ssdata(KESTD)
