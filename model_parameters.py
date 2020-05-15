@@ -89,7 +89,7 @@ Rn = np.array([[VarEnc, 0],
 # LQR control
 
 A_bar = np.vstack((np.concatenate((A, zeros((4, 1))), axis=1),
-                       np.array([1, 0, 0, 0, 0])))
+                   np.array([1, 0, 0, 0, 0])))
 B_bar = np.vstack((B, [0, 0]))
 Q1 = np.array([[1, 0, 0, 0, 0],
                [0, 1, 0, 0, 0],
