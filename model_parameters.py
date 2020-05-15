@@ -101,7 +101,7 @@ sys = ss(A, B, C, DD)
 sysd = c2d(sys, Ts, 'zoh')
 Ad, Bd, Cd, Dd = ssdata(sysd)
 Kd, Sd, Ed = lqr(A_bar, B_bar, Q1, P1)
-Kx = Kd[0, 0:4]  # Kd(1, 1:4)
+Kx = np.copy(Kd[0, 0:4])  # Kd(1, 1:4)
 Ki = Kd[0, 4]
 Kx[0, 2] = Kx[0, 2] * 0.8
 
