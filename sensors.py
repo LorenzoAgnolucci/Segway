@@ -1,11 +1,12 @@
 import numpy as np
-from ev3dev2.motor import Motor, OUTPUT_A, OUTPUT_D
+from ev3dev2.motor import Motor, OUTPUT_A, OUTPUT_B, OUTPUT_D
 from ev3dev2.sensor import INPUT_4
 from ev3dev2.sensor.lego import GyroSensor
 
 gyro = GyroSensor(INPUT_4)
 motor_a = Motor(OUTPUT_A)
 motor_b = Motor(OUTPUT_D)
+kickstand_servo = Motor(OUTPUT_B)
 
 
 # psi

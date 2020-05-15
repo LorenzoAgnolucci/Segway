@@ -11,12 +11,12 @@ class SampleData:
 
 def every(interval):
     def wrapped(func):
-        def f():
+        def f(robot):
             last_cycle_end = datetime.now()
             while True:
                 last_timestamp = datetime.now()
                 sampling_data = SampleData(last_cycle_end)
-                func(sampling_data=sampling_data)
+                func(robot, sampling_data=sampling_data)
                 now = datetime.now()
                 elapsed = now - last_timestamp
 
