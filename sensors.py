@@ -4,8 +4,8 @@ from ev3dev2.sensor import INPUT_4
 from ev3dev2.sensor.lego import GyroSensor
 
 gyro = GyroSensor(INPUT_4)
-motor_a = Motor(OUTPUT_A)
-motor_b = Motor(OUTPUT_D)
+motor_dx = Motor(OUTPUT_A)
+motor_sx = Motor(OUTPUT_D)
 kickstand_servo = Motor(OUTPUT_B)
 
 
@@ -21,10 +21,10 @@ def gyro_angular_velocity():
 
 # theta
 def get_avg_position():
-    return np.average(motor_a.position, motor_b.position)
+    return np.average(motor_dx.position, motor_sx.position)
 
 
 # theta_dot
 def get_speed():
-    degrees_per_s = np.average(motor_a.speed, motor_b.speed) / np.average(motor_a.count_per_rot, motor_b.count_per_rot)
+    degrees_per_s = np.average(motor_dx.speed, motor_sx.speed) / np.average(motor_dx.count_per_rot, motor_sx.count_per_rot)
     return np.deg2rad(degrees_per_s)
