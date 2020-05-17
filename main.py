@@ -114,8 +114,8 @@ def control_loop(robot: Robot, sampling_data: SampleData):
     if robot.disable_control:
         engine_speed = robot.engine_power
 
-    motor_dx.on(SpeedPercent(np.clip(engine_speed, 0, 100)))
-    motor_sx.on(SpeedPercent(np.clip(engine_speed, 0, 100)))
+    motor_dx.on(SpeedPercent(np.clip(engine_speed, -100, 100)))
+    motor_sx.on(SpeedPercent(np.clip(engine_speed, -100, 100)))
 
 
 def main():
