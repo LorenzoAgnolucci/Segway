@@ -20,8 +20,8 @@ logging.basicConfig(
 
 
 class Robot:
-    kickstand_servo_angular_velocity: int
-    engine_power: int
+    kickstand_servo_angular_velocity: int = 0
+    engine_power: int = 0
     enable_control = True
 
     @staticmethod
