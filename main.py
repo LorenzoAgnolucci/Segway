@@ -110,7 +110,9 @@ def control_loop(robot: Robot, sampling_data: SampleData):
     engine_speed = np.dot(params, x)
     engine_percent_gain = 100 / 9
     engine_speed *= engine_percent_gain
-    engine_speed += robot.engine_power
+
+    if robot.disable_control:
+        engine_speed = robot.engine_power
 
     motor_dx.on(SpeedPercent(np.clip(engine_speed, 0, 100)))
     motor_sx.on(SpeedPercent(np.clip(engine_speed, 0, 100)))
