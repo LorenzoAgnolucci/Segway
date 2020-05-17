@@ -23,9 +23,9 @@ print("end imports")
 logging.getLogger('transitions').setLevel(logging.INFO)
 
 logging.basicConfig(
-    format='%(asctime)s %(levelname)-8s %(message)s',
+    format='%(asctime)s.%(msecs)03d %(levelname)s:\t%(message)s',
     level=logging.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S,uuu')
+    datefmt='%Y-%m-%d %H:%M:%S')
 
 
 class Robot:
