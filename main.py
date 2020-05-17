@@ -30,9 +30,11 @@ class Robot:
         motor_dx.reset()
         print(f"pos: [{motor_dx.position} {motor_sx.position}]")
 
-    def on_enter_kickstand_up(self):
+    def on_enter_control(self):
         control_loop(self)
-        self.kickstand_servo_angular_velocity = 20
+
+    def on_enter_kickstand_up(self):
+        self.kickstand_servo_angular_velocity = 40
         kickstand_servo.on(SpeedPercent(self.kickstand_servo_angular_velocity))
 
     def on_enter_segway(self):
