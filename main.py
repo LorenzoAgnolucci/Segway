@@ -54,6 +54,8 @@ class Robot:
 
     def on_engine_stop(self):
         self.engine_power = 0
+        motor_dx.off()
+        motor_sx.off()
 
 
 @add_state_features(Timeout)
