@@ -13,12 +13,12 @@ kickstand_servo = Motor(OUTPUT_B)
 
 # psi
 def gyro_angle():
-    return np.deg2rad(gyro.angle) - cond_i
+    return np.deg2rad(gyro.angle_and_rate[0]) - cond_i
 
 
 # psi_dot
 def gyro_angular_velocity():
-    return np.deg2rad(gyro.rate)
+    return np.deg2rad(gyro.angle_and_rate[1])
 
 
 # theta
