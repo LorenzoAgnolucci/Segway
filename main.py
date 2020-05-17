@@ -24,8 +24,7 @@ class Robot:
     engine_power: int = 0
     enable_control = True
 
-    @staticmethod
-    def on_enter_calibration():
+    def on_enter_calibration(self):
         gyro.calibrate()
 
     def on_enter_kickstand_up(self):
@@ -41,8 +40,7 @@ class Robot:
         self.kickstand_servo_angular_velocity = -20
         kickstand_servo.on(SpeedPercent(self.kickstand_servo_angular_velocity))
 
-    @staticmethod
-    def on_exit_kickstand_down():
+    def on_exit_kickstand_down(self):
         kickstand_servo.off()
 
     def on_enter_trust_test(self):
