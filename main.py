@@ -25,7 +25,7 @@ logging.getLogger('transitions').setLevel(logging.INFO)
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S,%03d%')
+    datefmt='%Y-%m-%d %H:%M:%S,uuu')
 
 
 class Robot:
