@@ -97,6 +97,7 @@ def control_loop(robot: Robot, sampling_data: SampleData):
 
     params = np.hstack((np.ravel(Kx[0, :]), Ki))
     x = -np.array([get_avg_position(), gyro_angle(), get_speed(), gyro_angular_velocity(), theta_int])
+    print(f"[pos, angle, speed, ang_vel, theta_int] = {x}")
     engine_speed = np.dot(params, x)
     engine_percent_gain = 100 / 9
     engine_speed *= engine_percent_gain
