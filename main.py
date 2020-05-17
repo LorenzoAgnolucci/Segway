@@ -95,7 +95,7 @@ def control_loop(robot: Robot, sampling_data: SampleData):
     theta_int += (current_time - sampling_data.last_cycle_end) / timedelta(seconds=1) * get_avg_position()
     sampling_data.last_cycle_end = current_time
 
-    params = np.hstack((Kx[0, :].A1, Ki))
+    params = np.hstack((np.ravel(Kx[0, :]), Ki))
     x = -np.array([get_avg_position(), gyro_angle(), get_speed(), gyro_angular_velocity(), theta_int])
     engine_speed = np.dot(params, x)
     engine_percent_gain = 100 / 9
