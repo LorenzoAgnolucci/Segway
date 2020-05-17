@@ -1,15 +1,24 @@
 import logging
 from datetime import datetime, timedelta
 
+print("imported: logging, datetime")
+
 import numpy as np
+
+print("import numpy as np")
+
 from ev3dev2.motor import SpeedPercent
 from transitions import Machine
 from transitions.extensions.states import Timeout, add_state_features
+
+print("ev3dev2, transitions")
 
 from model_parameters import Kx, Ki
 from schedule import every, SampleData
 from sensors import get_avg_position, gyro_angle, get_speed, gyro_angular_velocity, motor_dx, motor_sx, gyro, \
     kickstand_servo
+
+print("end imports")
 
 logging.getLogger('transitions').setLevel(logging.INFO)
 

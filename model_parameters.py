@@ -111,6 +111,7 @@ C1 = np.array([[1, 0, 0, 0],
                [0, 0, 0, 1]])
 sys2 = ss(A, np.hstack((B, Dw)), C1, zeros((2, 4)))
 sysd2 = c2d(sys2, Ts, 'zoh')
-# KESTD, Lk, Pk = lqe(sys2.A, None, sys2.C, Qn, Rn)  # matlab version used 'delayed' estimator, here we use default provided by `python-control`
+# KESTD, Lk, Pk = lqe(sys2.A, zeros((2, 2)), sys2.C, Qn, Rn)  # matlab version used 'delayed' estimator, here we use default provided by `python-control`
+# either Qn should be 4x4 or A 2x2
 # KESTD = c2d(KESTD, Ts, 'zoh')
 # Ak, Bk, Ck, Dk = ssdata(KESTD)
