@@ -92,7 +92,7 @@ theta_int = 0
 def control_loop(robot: Robot, sampling_data: SampleData):
     global theta_int
     current_time = datetime.now()
-    theta_int += (current_time - sampling_data.last_cycle_end) / timedelta(seconds=1) * theta_int
+    theta_int += (current_time - sampling_data.last_cycle_end) / timedelta(seconds=1) * get_avg_position()
     sampling_data.last_cycle_end = current_time
 
     params = np.hstack((Kx[0, :].A1, Ki))
