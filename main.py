@@ -31,7 +31,7 @@ logging.basicConfig(
 class Robot:
     kickstand_servo_angular_velocity: int = 0
     engine_power: int = 0
-    enable_control = True
+    disable_control = False
 
     def on_enter_calibration(self):
         gyro.calibrate()
@@ -59,7 +59,7 @@ class Robot:
 
     def on_enter_trust_test(self):
         self.engine_power = -50
-        self.enable_control = False
+        self.disable_control = True
 
     def on_engine_stop(self):
         self.engine_power = 0
