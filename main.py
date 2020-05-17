@@ -26,6 +26,9 @@ class Robot:
 
     def on_enter_calibration(self):
         gyro.calibrate()
+        motor_sx.reset()
+        motor_dx.reset()
+        print(f"pos: [{motor_dx.position} {motor_sx.position}]")
 
     def on_enter_kickstand_up(self):
         control_loop(self)
