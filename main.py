@@ -103,8 +103,8 @@ def control_loop(robot: Robot, sampling_data: SampleData):
     engine_speed *= engine_percent_gain
     engine_speed += robot.engine_power
 
-    motor_dx.on(SpeedPercent(engine_speed))
-    motor_sx.on(SpeedPercent(engine_speed))
+    motor_dx.on(SpeedPercent(np.clip(engine_speed, 0, 100)))
+    motor_sx.on(SpeedPercent(np.clip(engine_speed, 0, 100)))
 
 
 def main():
