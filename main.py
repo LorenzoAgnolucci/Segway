@@ -62,7 +62,8 @@ class Robot:
 class RobotAutomata(Machine):
     states = [
         {"name": "idle"},
-        {"name": "calibration", "timeout": 5, "on_timeout": "t1"},
+        {"name": "calibration", "timeout": 7, "on_timeout": "t1"},
+        {"name": "control", "timeout": 0.5, "on_timeout": "t_12"},
         {"name": "waiting", "timeout": 1, "on_timeout": "t2"},
         {"name": "kickstand_up", "timeout": 1, "on_timeout": "t3"},
         {"name": "segway", "timeout": 10, "on_timeout": "t4"},
@@ -73,7 +74,8 @@ class RobotAutomata(Machine):
     ]
 
     transitions = [["t0", "idle", "calibration"],
-                   ["t1", "calibration", "waiting"],
+                   ["t1", "calibration", "control"],
+                   ["t_12", "control", "waiting"],
                    ["t2", "waiting", "kickstand_up"],
                    ["t3", "kickstand_up", "segway"],
                    ["t4", "segway", "kickstand_down"],
