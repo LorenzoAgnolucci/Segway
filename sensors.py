@@ -3,6 +3,8 @@ from ev3dev2.motor import Motor, OUTPUT_A, OUTPUT_B, OUTPUT_D
 from ev3dev2.sensor import INPUT_4
 from ev3dev2.sensor.lego import GyroSensor
 
+from model_parameters import cond_i
+
 gyro = GyroSensor(INPUT_4)
 motor_dx = Motor(OUTPUT_A)
 motor_sx = Motor(OUTPUT_D)
@@ -11,7 +13,7 @@ kickstand_servo = Motor(OUTPUT_B)
 
 # psi
 def gyro_angle():
-    return np.deg2rad(gyro.angle)
+    return np.deg2rad(gyro.angle) - cond_i
 
 
 # psi_dot
