@@ -16,15 +16,17 @@ from model_parameters import Kx, Ki
 from schedule import every, SampleData
 from sensors import get_avg_position, get_gyro_angle, get_speed, get_gyro_angular_velocity, motor_dx, motor_sx, gyro, \
     kickstand_servo, kickstand_servo_speed, fast_write, motor_dx_speed_write, motor_sx_speed_write
+from io import StringIO
 
 print("end imports")
 
 logging.getLogger('transitions').setLevel(logging.INFO)
-
+log_stream = StringIO()
 logging.basicConfig(
     format='%(asctime)s.%(msecs)03d %(levelname)s:\t%(message)s',
     level=logging.DEBUG,
-    datefmt='%Y-%m-%d %H:%M:%S')
+    datefmt='%Y-%m-%d %H:%M:%S',
+    stream=log_stream)
 
 
 class Robot:
@@ -75,8 +77,7 @@ class RobotAutomata(Machine):
     states = [
         {"name": "idle"},
         {"name": "calibration", "timeout": 7, "on_timeout": "t1"},
-        {"name": "control", "timeout": 0.5, "on_timeout": "t_12"},
-        {"name": "waiting", "timeout": 1, "on_timeout": "t2"},
+        {"name": "control", "timeout": 0.1, "on_timeout": "t2"},
         {"name": "kickstand_up", "timeout": 1, "on_timeout": "t3"},
         {"name": "segway", "timeout": 10, "on_timeout": "t4"},
         {"name": "kickstand_down", "timeout": 1, "on_timeout": "t5"},
@@ -87,8 +88,7 @@ class RobotAutomata(Machine):
 
     transitions = [["t0", "idle", "calibration"],
                    ["t1", "calibration", "control"],
-                   ["t_12", "control", "waiting"],
-                   ["t2", "waiting", "kickstand_up"],
+                   ["t2", "control", "kickstand_up"],
                    ["t3", "kickstand_up", "segway"],
                    ["t4", "segway", "kickstand_down"],
                    ["t5", "kickstand_down", "trust_test"],
@@ -109,7 +109,8 @@ def control_loop(robot: Robot, sampling_data: SampleData):
 
     params = np.hstack((np.ravel(Kx[0, :]), Ki))
     x = -np.array([get_avg_position(), get_gyro_angle(), get_speed(), get_gyro_angular_velocity(), theta_int])
-    logging.info(f"[pos, angle, speed, ang_vel, theta_int] = {-x}")
+    # logging.info(f"[pos, angle, speed, ang_vel, theta_int] = {-x}")
+    logging.info("")
     engine_speed = np.dot(params, x)
     engine_percent_gain = 100 / 9
     engine_speed *= engine_percent_gain
@@ -127,8 +128,10 @@ def main():
 
     r.to_calibration()
 
-    while r.state != "end":
-        pass
+    import time
+    time.sleep(20)
+    with open("output", "w") as f:
+        f.write(log_stream.getvalue())
 
 
 if __name__ == '__main__':
