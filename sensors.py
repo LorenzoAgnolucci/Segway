@@ -50,5 +50,5 @@ def get_avg_position():
 
 # theta_dot
 def get_speed():
-    degrees_per_s = np.average([fast_read(motor_dx_speed_read), motor_sx_speed_read])
+    degrees_per_s = np.average([fast_read(motor_dx_speed_read), fast_read(motor_sx_speed_read)])
     return np.deg2rad(degrees_per_s)
