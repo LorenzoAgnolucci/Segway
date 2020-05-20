@@ -7,7 +7,6 @@ import numpy as np
 
 print("import numpy as np")
 
-from ev3dev2.motor import SpeedPercent
 from transitions import Machine
 from transitions.extensions.states import Timeout, add_state_features
 
@@ -15,8 +14,8 @@ print("ev3dev2, transitions")
 
 from model_parameters import Kx, Ki
 from schedule import every, SampleData
-from sensors import get_avg_position, gyro_angle, get_speed, gyro_angular_velocity, motor_dx, motor_sx, gyro, \
-    kickstand_servo
+from sensors import get_avg_position, get_gyro_angle, get_speed, get_gyro_angular_velocity, motor_dx, motor_sx, gyro, \
+    kickstand_servo, kickstand_servo_speed, fast_write, motor_dx_speed_write, motor_sx_speed_write
 
 print("end imports")
 
@@ -37,6 +36,8 @@ class Robot:
         gyro.calibrate()
         motor_sx.reset()
         motor_dx.reset()
+        motor_sx.run_direct()
+        motor_dx.run_direct()
         print(f"pos: [{motor_dx.position} {motor_sx.position}]")
 
     def on_enter_control(self):
@@ -44,7 +45,7 @@ class Robot:
 
     def on_enter_kickstand_up(self):
         self.kickstand_servo_angular_velocity = 40
-        kickstand_servo.on(SpeedPercent(self.kickstand_servo_angular_velocity))
+        fast_write(kickstand_servo_speed, self.kickstand_servo_angular_velocity)
 
     def on_enter_segway(self):
         self.kickstand_servo_angular_velocity = 0
@@ -52,10 +53,10 @@ class Robot:
 
     def on_enter_kickstand_down(self):
         self.kickstand_servo_angular_velocity = -20
-        kickstand_servo.on(SpeedPercent(self.kickstand_servo_angular_velocity))
+        fast_write(kickstand_servo_speed, self.kickstand_servo_angular_velocity)
 
     def on_exit_kickstand_down(self):
-        kickstand_servo.off()
+        fast_write(kickstand_servo_speed, 0)
 
     def on_enter_trust_test(self):
         self.engine_power = -50
@@ -63,8 +64,8 @@ class Robot:
 
     def on_engine_stop(self):
         self.engine_power = 0
-        motor_dx.off()
-        motor_sx.off()
+        fast_write(motor_dx, 0)
+        fast_write(motor_sx, 0)
 
 
 @add_state_features(Timeout)
@@ -105,7 +106,7 @@ def control_loop(robot: Robot, sampling_data: SampleData):
     sampling_data.last_cycle_end = current_time
 
     params = np.hstack((np.ravel(Kx[0, :]), Ki))
-    x = -np.array([get_avg_position(), gyro_angle(), get_speed(), gyro_angular_velocity(), theta_int])
+    x = -np.array([get_avg_position(), get_gyro_angle(), get_speed(), get_gyro_angular_velocity(), theta_int])
     logging.info(f"[pos, angle, speed, ang_vel, theta_int] = {-x}")
     engine_speed = np.dot(params, x)
     engine_percent_gain = 100 / 9
@@ -114,8 +115,8 @@ def control_loop(robot: Robot, sampling_data: SampleData):
     if robot.disable_control:
         engine_speed = robot.engine_power
 
-    motor_dx.on(SpeedPercent(np.clip(engine_speed, -100, 100)))
-    motor_sx.on(SpeedPercent(np.clip(engine_speed, -100, 100)))
+    fast_write(motor_dx_speed_write, np.clip(engine_speed, -100, 100))
+    fast_write(motor_sx_speed_write, np.clip(engine_speed, -100, 100))
 
 
 def main():

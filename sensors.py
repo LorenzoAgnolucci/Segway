@@ -11,22 +11,44 @@ motor_sx = Motor(OUTPUT_D)
 kickstand_servo = Motor(OUTPUT_B)
 
 
+def fast_read(file):
+    file.seek(0)
+    return int(file.read().decode().strip())
+
+
+def fast_write(file, value):
+    file.truncate(0)
+    file.write(str(int(value)))
+    file.flush()
+
+
+gyro_angle = open(gyro._path + "/value0", "rb")
+gyro_rate = open(gyro._path + "/value1", "rb")
+motor_dx_position = open(motor_dx._path + "/position", "rb")
+motor_sx_position = open(motor_sx._path + "/position", "rb")
+motor_dx_speed_read = open(motor_dx._path + "/speed_sp", "rb")
+motor_sx_speed_read = open(motor_sx._path + "/speed_sp", "rb")
+motor_dx_speed_write = open(motor_dx._path + "/duty_cycle_sp", "w")
+motor_sx_speed_write = open(motor_sx._path + "/duty_cycle_sp", "w")
+kickstand_servo_speed = open(kickstand_servo._path + "/duty_cycle_sp", "w")
+
+
 # psi
-def gyro_angle():
-    return np.deg2rad(gyro.angle_and_rate[0]) - cond_i
+def get_gyro_angle():
+    return np.deg2rad(fast_read(gyro_angle)) - cond_i
 
 
 # psi_dot
-def gyro_angular_velocity():
-    return np.deg2rad(gyro.angle_and_rate[1])
+def get_gyro_angular_velocity():
+    return np.deg2rad(fast_read(gyro_rate))
 
 
 # theta
 def get_avg_position():
-    return np.average([np.deg2rad(motor_dx.position), np.deg2rad(motor_sx.position)])
+    return np.average([np.deg2rad(fast_read(motor_dx_position)), np.deg2rad(fast_read(motor_sx_position))])
 
 
 # theta_dot
 def get_speed():
-    degrees_per_s = np.average([motor_dx.speed * 360, motor_sx.speed * 360]) / np.average([motor_dx.count_per_rot, motor_sx.count_per_rot])
+    degrees_per_s = np.average([fast_read(motor_dx_speed_read), motor_sx_speed_read])
     return np.deg2rad(degrees_per_s)
