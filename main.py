@@ -34,6 +34,7 @@ class Robot:
 
     def on_enter_calibration(self):
         gyro.calibrate()
+        gyro.mode = gyro.MODE_GYRO_G_A
         motor_sx.reset()
         motor_dx.reset()
         motor_sx.run_direct()
