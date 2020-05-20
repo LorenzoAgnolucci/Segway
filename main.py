@@ -39,6 +39,7 @@ class Robot:
         motor_dx.reset()
         motor_sx.run_direct()
         motor_dx.run_direct()
+        kickstand_servo.run_direct()
         print(f"pos: [{motor_dx.position} {motor_sx.position}]")
 
     def on_enter_control(self):
