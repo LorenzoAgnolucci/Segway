@@ -34,7 +34,7 @@ logging.basicConfig(
 stop_control_thread: bool = False
 disable_control: bool = False
 engine_power: int = 0
-SAMPLING_INTERVAL = timedelta(milliseconds=1)
+SAMPLING_INTERVAL = 0.001
 
 
 class Control(threading.Thread):
@@ -43,10 +43,10 @@ class Control(threading.Thread):
 
     def run(self):
         theta_int = 0
-        previous_start_time = datetime.now()
+        previous_start_time = time.time()
         while not stop_control_thread:
-            current_start_time = datetime.now()
-            theta_int += (current_start_time - previous_start_time) / timedelta(seconds=1) * get_avg_position()
+            current_start_time = time.time()
+            theta_int += (current_start_time - previous_start_time) * get_avg_position()
 
             params = np.hstack((np.ravel(Kx[0, :]), Ki))
             x = np.array([get_avg_position(), get_gyro_angle(), get_speed(), get_gyro_angular_velocity(), theta_int])
@@ -61,7 +61,7 @@ class Control(threading.Thread):
             fast_write(motor_dx_speed_write, np.clip(engine_speed, -100, 100))
             fast_write(motor_sx_speed_write, np.clip(engine_speed, -100, 100))
 
-            while datetime.now() - current_start_time < SAMPLING_INTERVAL:
+            while time.time() - current_start_time < SAMPLING_INTERVAL:
                 time.sleep(0.001)
 
             previous_start_time = current_start_time
