@@ -35,20 +35,20 @@ kickstand_servo_speed = open(kickstand_servo._path + "/duty_cycle_sp", "w")
 
 # psi
 def get_gyro_angle():
-    return np.deg2rad(fast_read(gyro_angle)) - cond_i
+    return np.deg2rad(gyro.angle_and_rate[0]) - cond_i
 
 
 # psi_dot
 def get_gyro_angular_velocity():
-    return np.deg2rad(fast_read(gyro_rate))
+    return np.deg2rad(gyro.angle_and_rate[1])
 
 
 # theta
 def get_avg_position():
-    return (np.deg2rad(fast_read(motor_dx_position)) + np.deg2rad(fast_read(motor_sx_position))) / 2
+    return (np.deg2rad(motor_dx.position) + np.deg2rad(motor_sx.position)) / 2
 
 
 # theta_dot
 def get_speed():
-    degrees_per_s = (fast_read(motor_dx_speed_read) + fast_read(motor_sx_speed_read)) / 2
+    degrees_per_s = (motor_dx.speed + motor_sx.speed) / 2
     return np.deg2rad(degrees_per_s)

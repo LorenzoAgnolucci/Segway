@@ -58,8 +58,8 @@ class Control(threading.Thread):
             if disable_control:
                 engine_speed = engine_power
 
-            fast_write(motor_dx_speed_write, np.clip(engine_speed, -100, 100))
-            fast_write(motor_sx_speed_write, np.clip(engine_speed, -100, 100))
+            motor_dx.on(np.clip(engine_speed, -100, 100))
+            motor_sx.on(np.clip(engine_speed, -100, 100))
 
             while time.time() - current_start_time < SAMPLING_INTERVAL:
                 time.sleep(0.001)
@@ -103,8 +103,8 @@ def main():
 def engine_stop():
     global engine_power
     engine_power = 0
-    fast_write(motor_dx_speed_write, 0)
-    fast_write(motor_sx_speed_write, 0)
+    motor_dx.off()
+    motor_sx.off()
 
 
 def post_kickstand_down():
@@ -130,8 +130,6 @@ def calibrate():
     gyro.mode = gyro.MODE_GYRO_G_A
     motor_sx.reset()
     motor_dx.reset()
-    motor_sx.run_direct()
-    motor_dx.run_direct()
 
 
 if __name__ == '__main__':
