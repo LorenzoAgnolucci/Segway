@@ -83,6 +83,10 @@ def main():
 
     post_kickstand_down()
 
+    global engine_power
+    global disable_control
+    global stop_control_thread
+
     engine_power = -50
     disable_control = False
 
