@@ -3,6 +3,8 @@ import threading
 from datetime import datetime, timedelta
 import time
 
+from ev3dev2.motor import SpeedPercent
+
 print("imported: logging, datetime, threading")
 
 import numpy as np
@@ -48,8 +50,7 @@ class Control(threading.Thread):
 
             params = np.hstack((np.ravel(Kx[0, :]), Ki))
             x = np.array([get_avg_position(), get_gyro_angle(), get_speed(), get_gyro_angular_velocity(), theta_int])
-            # print(f"[pos, angle, speed, ang_vel, theta_int] = {x}")
-            logging.info("")
+            print(f"[pos, angle, speed, ang_vel, theta_int] =  {x}")
             engine_speed = np.dot(params, x)
             engine_percent_gain = 100 / 9
             engine_speed *= engine_percent_gain
@@ -107,23 +108,22 @@ def engine_stop():
 
 
 def post_kickstand_down():
-    fast_write(kickstand_servo_speed, 0)
+    kickstand_servo.off()
 
 
 def kickstand_down():
     kickstand_servo_angular_velocity = -20
-    fast_write(kickstand_servo_speed, kickstand_servo_angular_velocity)
+    kickstand_servo.on(SpeedPercent(kickstand_servo_angular_velocity))
 
 
 def segway():
     kickstand_servo_angular_velocity = 0
-    fast_write(kickstand_servo_speed, kickstand_servo_angular_velocity)
+    kickstand_servo.on(SpeedPercent(kickstand_servo_angular_velocity))
 
 
 def kickstand_up():
     kickstand_servo_angular_velocity = 20
-    fast_write(kickstand_servo_speed, kickstand_servo_angular_velocity)
-
+    kickstand_servo.on(SpeedPercent(kickstand_servo_angular_velocity))
 
 def calibrate():
     gyro.calibrate()
@@ -132,7 +132,6 @@ def calibrate():
     motor_dx.reset()
     motor_sx.run_direct()
     motor_dx.run_direct()
-    kickstand_servo.run_direct()
 
 
 if __name__ == '__main__':
