@@ -45,10 +45,10 @@ def get_gyro_angular_velocity():
 
 # theta
 def get_avg_position():
-    return np.average([np.deg2rad(fast_read(motor_dx_position)), np.deg2rad(fast_read(motor_sx_position))])
+    return (np.deg2rad(fast_read(motor_dx_position)) + np.deg2rad(fast_read(motor_sx_position))) / 2
 
 
 # theta_dot
 def get_speed():
-    degrees_per_s = np.average([fast_read(motor_dx_speed_read), fast_read(motor_sx_speed_read)])
+    degrees_per_s = (fast_read(motor_dx_speed_read) + fast_read(motor_sx_speed_read)) / 2
     return np.deg2rad(degrees_per_s)
