@@ -1,7 +1,8 @@
 import numpy as np
-from ev3dev2.motor import Motor, OUTPUT_A, OUTPUT_B, OUTPUT_D
+from ev3dev2.motor import OUTPUT_A, OUTPUT_B, OUTPUT_D
 from ev3dev2.sensor import INPUT_4
-from ev3dev2.sensor.lego import GyroSensor
+# from ev3dev2.sensor.lego import GyroSensor
+from ev3fast import Motor, GyroSensor
 
 from model_parameters import cond_i
 
