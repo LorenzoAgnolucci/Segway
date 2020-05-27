@@ -1,0 +1,3 @@
+/home/giova/PycharmProjects/segway/cpp/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/giova/PycharmProjects/segway/cpp/cmake-build-debug/CMakeFiles/segway.dir
+/home/giova/PycharmProjects/segway/cpp/cmake-build-debug/CMakeFiles/edit_cache.dir

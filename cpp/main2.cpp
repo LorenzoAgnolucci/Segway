@@ -2,6 +2,8 @@
 #include <iostream>
 #include <chrono>
 #include <sys/resource.h>
+#include <deque>
+#include <numeric>
 #include <sstream>
 #include "ev3dev.h"
 #include "sensors.h"
@@ -13,7 +15,7 @@ using namespace std::chrono;
 using ev3dev::gyro_sensor;
 using ev3dev::motor;
 
-const auto SAMPLING_TIME = milliseconds(8);
+const auto SAMPLING_TIME = milliseconds(10);
 volatile bool stop_control_thread = false;
 volatile bool disable_control = false;
 gyro_sensor gyro(ev3dev::INPUT_4);
@@ -53,34 +55,34 @@ void control_loop() {
     }
 
     double theta_int = 0.;
+    double gyro_angle = -cond_i;
+    std::deque<double> motor_angle_history(5);
     auto previous_start_time = high_resolution_clock::now();
-    std::vector<int> timestamps;
+    std::vector<int> timestamps(5, 10);
     std::vector<std::string> data;
+
+    motor_angle_history.push_back(0);
 
     while (!stop_control_thread) {
         auto current_start_time = high_resolution_clock::now();
+        auto last_cycle_duration = current_start_time - previous_start_time;
+        auto last_cycle_ms = duration_cast<milliseconds>(last_cycle_duration).count();
 
-        std::stringstream cur_data;
-        cur_data << "[position, angle, speed, rate] = ["
-                  << get_avg_position(motor_dx, motor_sx) << " "
-                  << get_gyro_angle(gyro) << " "
-                  << get_speed(motor_dx, motor_sx) << " "
-                  << get_gyro_rate(gyro)
-                  << "] "
-                  << "t: [ms] " << duration_cast<milliseconds>(current_start_time - previous_start_time).count();
-        data.push_back(cur_data.str());
+        auto engine_position = get_avg_position(motor_dx, motor_sx);
+        auto gyro_rate = get_gyro_rate(gyro);
 
-        timestamps.push_back(duration_cast<milliseconds>(current_start_time - previous_start_time).count());
+        auto motor_angular_speed = 1000 * (engine_position - motor_angle_history[0]) / std::accumulate(timestamps.end() - 5, timestamps.end(), 0);
+        motor_angle_history.pop_front();
+        motor_angle_history.push_back(engine_position);
 
-        auto pos_component = -k_pos * get_avg_position(motor_dx, motor_sx);
-        auto ang_component = k_angle * get_gyro_angle(gyro);
-        auto speed_component = -k_speed * get_speed(motor_dx, motor_sx);
-        auto ang_vel_component = k_ang_vel * get_gyro_rate(gyro);
+        auto pos_component = -k_pos * motor_angle_history.back();
+        auto ang_component = k_angle * gyro_angle;
+        auto speed_component = -k_speed * motor_angular_speed;
+        auto ang_vel_component = k_ang_vel * gyro_rate;
         auto ang_int_component = -k_angle_int * theta_int;
 
         auto engine_speed = pos_component + ang_component + speed_component + ang_vel_component + ang_int_component;
         double engine_percent_gain = 100. / 9;
-
         engine_speed *= engine_percent_gain;
 
         if (disable_control) {
@@ -90,17 +92,33 @@ void control_loop() {
         motor_dx.set_duty_cycle_sp(clamp(engine_speed, -100., 100.));
         motor_sx.set_duty_cycle_sp(clamp(engine_speed, -100., 100.));
 
-        /*while (high_resolution_clock::now() - current_start_time < SAMPLING_TIME) {
-            std::this_thread::sleep_for(microseconds (100));
-        }*/
+        theta_int += static_cast<double>(last_cycle_ms) * engine_position / 1000.;
+        gyro_angle += static_cast<double>(last_cycle_ms) * gyro_rate / 1000.;
 
-        theta_int += static_cast<double>(duration_cast<milliseconds>(current_start_time - previous_start_time).count()) * get_avg_position(motor_dx, motor_sx) / 1000.;
+        std::stringstream cur_data;
+        cur_data << "[position, angle, speed, rate] = ["
+                 << get_avg_position(motor_dx, motor_sx) << " "
+                 << get_gyro_angle(gyro) << " "
+                 << get_speed(motor_dx, motor_sx) << " "
+                 << get_gyro_rate(gyro)
+                 << "] "
+                 << "t: [ms] " << last_cycle_ms;
+        data.push_back(cur_data.str());
+        timestamps.push_back(last_cycle_ms);
+
+        /*
+        while (high_resolution_clock::now() - current_start_time < SAMPLING_TIME) {
+            std::this_thread::sleep_for(microseconds (100));
+        }
+        */
+
         previous_start_time = current_start_time;
     }
 
     for (const auto& s : data) {
-        std::cout << s << std::endl;
+        std::cout << s << "\n";
     }
+    std::cout << std::endl;
 }
 
 int main() {
@@ -148,7 +166,7 @@ void calibrate() {
     auto current_mode = gyro.mode();
     gyro.set_mode(gyro_sensor::mode_gyro_cal);
     std::this_thread::sleep_for(seconds(2));
-    gyro.set_mode(ev3dev::gyro_sensor::mode_gyro_g_a);
+    gyro.set_mode(ev3dev::gyro_sensor::mode_gyro_rate);
 
     motor_dx.run_direct();
     motor_sx.run_direct();
@@ -157,7 +175,7 @@ void calibrate() {
 
 
 void kickstand_up() {
-    kickstand_servo.set_duty_cycle_sp(30);
+    kickstand_servo.set_duty_cycle_sp(20);
 }
 
 void segway() {
