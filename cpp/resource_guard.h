@@ -1,14 +1,13 @@
 #pragma once
 
-template<typename T>
 class resource_guard {
 public:
-    explicit resource_guard(T& resource) : resource(resource) {}
+    explicit resource_guard(const std::function<void()>& resource_handler) : resource_handler(resource_handler) {}
 
     ~resource_guard() {
-        resource.reset();
+        resource_handler();
     }
 private:
-    T& resource;
+    const std::function<void()>& resource_handler;
 };
 

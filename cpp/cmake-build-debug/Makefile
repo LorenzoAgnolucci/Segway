@@ -170,32 +170,32 @@ ev3dev.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/segway.dir/build.make CMakeFiles/segway.dir/ev3dev.cpp.s
 .PHONY : ev3dev.cpp.s
 
-main2.o: main2.cpp.o
+main.o: main.cpp.o
 
-.PHONY : main2.o
+.PHONY : main.o
 
 # target to build an object file
-main2.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/segway.dir/build.make CMakeFiles/segway.dir/main2.cpp.o
-.PHONY : main2.cpp.o
+main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/segway.dir/build.make CMakeFiles/segway.dir/main.cpp.o
+.PHONY : main.cpp.o
 
-main2.i: main2.cpp.i
+main.i: main.cpp.i
 
-.PHONY : main2.i
+.PHONY : main.i
 
 # target to preprocess a source file
-main2.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/segway.dir/build.make CMakeFiles/segway.dir/main2.cpp.i
-.PHONY : main2.cpp.i
+main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/segway.dir/build.make CMakeFiles/segway.dir/main.cpp.i
+.PHONY : main.cpp.i
 
-main2.s: main2.cpp.s
+main.s: main.cpp.s
 
-.PHONY : main2.s
+.PHONY : main.s
 
 # target to generate assembly for a file
-main2.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/segway.dir/build.make CMakeFiles/segway.dir/main2.cpp.s
-.PHONY : main2.cpp.s
+main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/segway.dir/build.make CMakeFiles/segway.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 model_parameters.o: model_parameters.cpp.o
 
@@ -290,9 +290,9 @@ help:
 	@echo "... ev3dev.o"
 	@echo "... ev3dev.i"
 	@echo "... ev3dev.s"
-	@echo "... main2.o"
-	@echo "... main2.i"
-	@echo "... main2.s"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 	@echo "... model_parameters.o"
 	@echo "... model_parameters.i"
 	@echo "... model_parameters.s"

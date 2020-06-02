@@ -88,7 +88,7 @@
 		<Unit filename="/home/giova/PycharmProjects/segway/cpp/ev3dev.h">
 			<Option target="segway"/>
 		</Unit>
-		<Unit filename="/home/giova/PycharmProjects/segway/cpp/main2.cpp">
+		<Unit filename="/home/giova/PycharmProjects/segway/cpp/main.cpp">
 			<Option target="segway"/>
 		</Unit>
 		<Unit filename="/home/giova/PycharmProjects/segway/cpp/model_parameters.cpp">

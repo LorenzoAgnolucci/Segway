@@ -1,6 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/segway.dir/ev3dev.cpp.o"
-  "CMakeFiles/segway.dir/main2.cpp.o"
+  "CMakeFiles/segway.dir/main.cpp.o"
   "CMakeFiles/segway.dir/model_parameters.cpp.o"
   "CMakeFiles/segway.dir/sensors.cpp.o"
   "CMakeFiles/segway.dir/utils.cpp.o"

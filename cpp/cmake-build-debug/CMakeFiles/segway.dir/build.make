@@ -77,18 +77,18 @@ include CMakeFiles/segway.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/segway.dir/flags.make
 
-CMakeFiles/segway.dir/main2.cpp.o: CMakeFiles/segway.dir/flags.make
-CMakeFiles/segway.dir/main2.cpp.o: ../main2.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/giova/PycharmProjects/segway/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/segway.dir/main2.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/segway.dir/main2.cpp.o -c /home/giova/PycharmProjects/segway/cpp/main2.cpp
+CMakeFiles/segway.dir/main.cpp.o: CMakeFiles/segway.dir/flags.make
+CMakeFiles/segway.dir/main.cpp.o: ../main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/giova/PycharmProjects/segway/cpp/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/segway.dir/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/segway.dir/main.cpp.o -c /home/giova/PycharmProjects/segway/cpp/main.cpp
 
-CMakeFiles/segway.dir/main2.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/segway.dir/main2.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/giova/PycharmProjects/segway/cpp/main2.cpp > CMakeFiles/segway.dir/main2.cpp.i
+CMakeFiles/segway.dir/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/segway.dir/main.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/giova/PycharmProjects/segway/cpp/main.cpp > CMakeFiles/segway.dir/main.cpp.i
 
-CMakeFiles/segway.dir/main2.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/segway.dir/main2.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/giova/PycharmProjects/segway/cpp/main2.cpp -o CMakeFiles/segway.dir/main2.cpp.s
+CMakeFiles/segway.dir/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/segway.dir/main.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/giova/PycharmProjects/segway/cpp/main.cpp -o CMakeFiles/segway.dir/main.cpp.s
 
 CMakeFiles/segway.dir/ev3dev.cpp.o: CMakeFiles/segway.dir/flags.make
 CMakeFiles/segway.dir/ev3dev.cpp.o: ../ev3dev.cpp
@@ -144,7 +144,7 @@ CMakeFiles/segway.dir/model_parameters.cpp.s: cmake_force
 
 # Object files for target segway
 segway_OBJECTS = \
-"CMakeFiles/segway.dir/main2.cpp.o" \
+"CMakeFiles/segway.dir/main.cpp.o" \
 "CMakeFiles/segway.dir/ev3dev.cpp.o" \
 "CMakeFiles/segway.dir/sensors.cpp.o" \
 "CMakeFiles/segway.dir/utils.cpp.o" \
@@ -153,7 +153,7 @@ segway_OBJECTS = \
 # External object files for target segway
 segway_EXTERNAL_OBJECTS =
 
-segway: CMakeFiles/segway.dir/main2.cpp.o
+segway: CMakeFiles/segway.dir/main.cpp.o
 segway: CMakeFiles/segway.dir/ev3dev.cpp.o
 segway: CMakeFiles/segway.dir/sensors.cpp.o
 segway: CMakeFiles/segway.dir/utils.cpp.o

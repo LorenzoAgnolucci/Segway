@@ -1,3 +1,0 @@
-/src/cmake-output/CMakeFiles/edit_cache.dir
-/src/cmake-output/CMakeFiles/rebuild_cache.dir
-/src/cmake-output/CMakeFiles/segway.dir
