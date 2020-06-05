@@ -31,6 +31,10 @@ void kickstand_down();
 void post_kickstand_down();
 void engine_stop();
 
+std::thread start_control();
+
+void stop_control(std::thread& control_thread);
+
 void handler(int sig) {
     void *trace_elems[20];
     int trace_elem_count(backtrace(trace_elems, 20));
@@ -44,6 +48,7 @@ void handler(int sig) {
 }
 
 void control_loop() {
+    std::cout << "Starting control loop..." << std::endl;
     pthread_t this_thread = pthread_self();
     struct sched_param params;
     params.sched_priority = sched_get_priority_max(SCHED_FIFO);
@@ -81,6 +86,7 @@ void control_loop() {
         double engine_percent_gain = 100. / 9;
         engine_speed *= engine_percent_gain;
 
+        /*
         std::stringstream cur_data;
         cur_data << "[position, angle, speed, rate, theta_int, power] = ["
                  << engine_position << " "
@@ -93,6 +99,7 @@ void control_loop() {
         //<< "t: [ms] " << duration_cast<milliseconds>(current_start_time - previous_start_time).count();
                  << "accum: " << accumulated_time;
         data.push_back(cur_data.str());
+         */
 
         motor_dx.set_duty_cycle_sp(clamp(engine_speed, -100., 100.));
         motor_sx.set_duty_cycle_sp(clamp(engine_speed, -100., 100.));
@@ -136,18 +143,29 @@ int main() {
     std::this_thread::sleep_for(seconds(3));
     std::cout << " started" << std::endl;
 
-    calibrate();
+    std::string line;
+    std::getline(std::cin, line);
+    while (line != "exit") {
+        while (line != "start") {
+            std::getline(std::cin, line);
+        }
 
-    std::cout << "Calibration finished" << std::endl;
+        auto control_thread = start_control();
 
-    std::thread control_thread(control_loop);
+        while (line != "stop") {
+            std::getline(std::cin, line);
+        }
 
-    kickstand_up();
-    std::this_thread::sleep_for(seconds(2));
+        stop_control(control_thread);
+        std::getline(std::cin, line);
+    }
 
-    segway();
-    std::this_thread::sleep_for(seconds(7));
+    std::cout << "Ended" << std::endl;
+    std::this_thread::sleep_for(seconds(5));
+    std::cout << "---" << std::endl;
+}
 
+void stop_control(std::thread& control_thread) {
     kickstand_down();
     std::this_thread::sleep_for(seconds(2));
 
@@ -159,10 +177,22 @@ int main() {
     control_thread.join();
 
     engine_stop();
+}
 
-    std::cout << "Ended" << std::endl;
-    std::this_thread::sleep_for(seconds(5));
-    std::cout << "---" << std::endl;
+std::thread start_control() {
+    std::cout << "Calibrating...";
+    calibrate();
+    std::cout << " calibration finished" << std::endl;
+
+    stop_control_thread = false;
+    std::thread control_thread(control_loop);
+
+    kickstand_up();
+    std::this_thread::sleep_for(seconds(2));
+
+    segway();
+
+    return control_thread;
 }
 
 void calibrate() {
