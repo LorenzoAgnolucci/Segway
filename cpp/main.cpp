@@ -23,17 +23,26 @@ gyro_sensor gyro(ev3dev::INPUT_4);
 motor motor_dx(ev3dev::OUTPUT_A);
 motor motor_sx(ev3dev::OUTPUT_D);
 motor kickstand_servo(ev3dev::OUTPUT_B);
+const int MAX_REFERENCE_TARGET_SPEED = 100;
+const int MAX_STEERING = 50;
+volatile int duty_cycle_target_speed = 0;
+volatile int steering = 0;
 
 void calibrate();
+
 void segway();
+
 void kickstand_up();
+
 void kickstand_down();
+
 void post_kickstand_down();
+
 void engine_stop();
 
 std::thread start_control();
 
-void stop_control(std::thread& control_thread);
+void stop_control(std::thread &control_thread);
 
 void handler(int sig) {
     void *trace_elems[20];
@@ -64,6 +73,8 @@ void control_loop() {
     std::vector<std::string> data;
     int accumulated_time = 0;
 
+    double motor_angle_reference = 0;
+
     while (!stop_control_thread) {
         auto current_start_time = high_resolution_clock::now();
 
@@ -76,9 +87,17 @@ void control_loop() {
         timestamps.push_back(cycle_duration);
         accumulated_time += cycle_duration;
 
-        auto pos_component = -k_pos * engine_position;
+        double magic_laurens_constant = deg2rad(1.7 * 6); // Actual speed in radians/sec per unit of motor speed
+        auto angular_speed_reference = duty_cycle_target_speed * magic_laurens_constant;
+        motor_angle_reference += angular_speed_reference * cycle_duration;
+        auto motor_angle_error = engine_position - motor_angle_reference;
+
+        auto motor_angular_speed_error = motor_speed -
+                                         angular_speed_reference; // Uncommenting this leads to a raher abrubt change in speed when using the remote. So I'll leave it commented until I add some code that gradually increases ths reference when a button is pressed or depressed
+
+        auto pos_component = -k_pos * motor_angle_error;
         auto ang_component = k_angle * gyro_angle;
-        auto speed_component = -k_speed * motor_speed;
+        auto speed_component = -k_speed * motor_speed; // motor_angular_speed_error
         auto ang_vel_component = k_ang_vel * gyro_rate;
         auto ang_int_component = -k_angle_int * theta_int;
 
@@ -101,14 +120,14 @@ void control_loop() {
         data.push_back(cur_data.str());
          */
 
-        motor_dx.set_duty_cycle_sp(clamp(engine_speed, -100., 100.));
-        motor_sx.set_duty_cycle_sp(clamp(engine_speed, -100., 100.));
+        motor_dx.set_duty_cycle_sp(clamp(engine_speed - steering, -100., 100.));
+        motor_sx.set_duty_cycle_sp(clamp(engine_speed + steering, -100., 100.));
 
         while (high_resolution_clock::now() - current_start_time < SAMPLING_TIME) {
-            std::this_thread::sleep_for(microseconds (100));
+            std::this_thread::sleep_for(microseconds(100));
         }
 
-        theta_int += static_cast<double>(cycle_duration) * engine_position / 1000.;
+        theta_int += static_cast<double>(cycle_duration) * motor_angle_error / 1000.;
         previous_start_time = current_start_time;
     }
 
@@ -120,14 +139,14 @@ void control_loop() {
         motor_sx.set_duty_cycle_sp(engine_speed);
 
         while (high_resolution_clock::now() - current_start_time < SAMPLING_TIME) {
-            std::this_thread::sleep_for(microseconds (100));
+            std::this_thread::sleep_for(microseconds(100));
         }
     }
 
     motor_dx.set_duty_cycle_sp(0);
     motor_sx.set_duty_cycle_sp(0);
 
-    for (const auto& s : data) {
+    for (const auto &s : data) {
         std::cout << s << std::endl;
     }
 }
@@ -135,7 +154,10 @@ void control_loop() {
 int main() {
     signal(SIGSEGV, handler);
     setpriority(PRIO_PROCESS, 0, -20);
-    resource_guard motor_dx_guard([]() { std::cout << "stop"; motor_dx.set_duty_cycle_sp(0); });
+    resource_guard motor_dx_guard([]() {
+        std::cout << "stop";
+        motor_dx.set_duty_cycle_sp(0);
+    });
     resource_guard motor_sx_guard([]() { motor_sx.set_duty_cycle_sp(0); });
     resource_guard kickstand_guard([]() { kickstand_down(); });
 
@@ -154,6 +176,18 @@ int main() {
 
         while (line != "stop") {
             std::getline(std::cin, line);
+            if (line == "speed_ref+" && duty_cycle_target_speed < MAX_REFERENCE_TARGET_SPEED) {
+                duty_cycle_target_speed += 1;
+            }
+            if (line == "speed_ref-" && duty_cycle_target_speed > (-MAX_REFERENCE_TARGET_SPEED)) {
+                duty_cycle_target_speed -= 1;
+            }
+            if (line == "steer_ref+" && steering < MAX_STEERING) {
+                steering += 1;
+            }
+            if (line == "steer_ref-" && steering > (-MAX_STEERING)) {
+                steering -= 1;
+            }
         }
 
         stop_control(control_thread);
@@ -165,7 +199,7 @@ int main() {
     std::cout << "---" << std::endl;
 }
 
-void stop_control(std::thread& control_thread) {
+void stop_control(std::thread &control_thread) {
     kickstand_down();
     std::this_thread::sleep_for(seconds(2));
 
@@ -235,3 +269,4 @@ void engine_stop() {
     motor_dx.set_duty_cycle_sp(0);
     motor_sx.set_duty_cycle_sp(0);
 }
+
