@@ -170,7 +170,7 @@ int main() {
     resource_guard motor_sx_guard([]() { motor_sx.set_duty_cycle_sp(0); });
     resource_guard kickstand_guard([]() { kickstand_down(); });
 
-    std::cout << "Started" << std::flush;
+    std::cout << "Started" << std::endl;
 
     std::string line;
     std::getline(std::cin, line);
