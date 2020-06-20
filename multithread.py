@@ -1,4 +1,5 @@
 import logging
+import os
 import threading
 from datetime import datetime, timedelta
 import time
@@ -50,7 +51,7 @@ class Control(threading.Thread):
 
             params = np.hstack((np.ravel(Kx[0, :]), Ki))
             x = np.array([get_avg_position(), get_gyro_angle(), get_speed(), get_gyro_angular_velocity(), theta_int])
-            print(f"[pos, angle, speed, ang_vel, theta_int] =  {x}")
+            logging.info(f"[pos, angle, speed, ang_vel, theta_int] =  {x}")
             engine_speed = np.dot(params, x)
             engine_percent_gain = 100 / 9
             engine_speed *= engine_percent_gain
@@ -68,6 +69,7 @@ class Control(threading.Thread):
 
 
 def main():
+    os.setpriority(os.PRIO_PROCESS, 0, -20)
     calibrate()
 
     control_thread = Control()
