@@ -18,7 +18,6 @@ using ev3dev::gyro_sensor;
 using ev3dev::motor;
 
 const auto SAMPLING_TIME = milliseconds(8);
-const int STOP_STABILIZATION_CYCLES = 50;
 double DUTY_RADIANS_CONVERSION_RATE = deg2rad(9.6); // Actual speed in radians/sec per unit of motor speed
 volatile bool stop_control_thread = false;
 gyro_sensor gyro(ev3dev::INPUT_4);
@@ -28,6 +27,7 @@ motor kickstand_servo(ev3dev::OUTPUT_B);
 const int MAX_REFERENCE_TARGET_SPEED = 100;
 const int MAX_STEERING = 50;
 volatile int duty_cycle_target_speed = 0;
+volatile int initial_duty_cycle_target_speed = 0;
 volatile int steering = 0;
 
 void calibrate();
@@ -78,11 +78,11 @@ void control_loop() {
     double motor_angle_reference = 0;
     int stop_stabilize_counter = 0;
 
-    while (stop_stabilize_counter < STOP_STABILIZATION_CYCLES) {
+    while (stop_stabilize_counter < 5 * initial_duty_cycle_target_speed + 20) {
         if (stop_control_thread) {
             stop_stabilize_counter++;
-            duty_cycle_target_speed = 0;
-            steering = 0;
+            duty_cycle_target_speed -= sign(duty_cycle_target_speed) * (stop_stabilize_counter % 5 == 0);
+            steering -= sign(steering) * (stop_stabilize_counter % 5 == 0);
         }
 
         auto current_start_time = high_resolution_clock::now();
@@ -218,6 +218,7 @@ void stop_control(std::thread &control_thread) {
     post_kickstand_down();
 
     std::this_thread::sleep_for(milliseconds(100));
+    initial_duty_cycle_target_speed = duty_cycle_target_speed;
     stop_control_thread = true;
 
     control_thread.join();
