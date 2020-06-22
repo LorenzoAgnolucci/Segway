@@ -31,11 +31,12 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
     stream=log_stream)
 
+output_data = np.empty((0, 6))
 
 stop_control_thread: bool = False
 disable_control: bool = False
 engine_power: int = 0
-SAMPLING_INTERVAL = 0.001
+SAMPLING_INTERVAL = 0.070
 
 
 class Control(threading.Thread):
@@ -45,13 +46,17 @@ class Control(threading.Thread):
     def run(self):
         theta_int = 0
         previous_start_time = time.time()
+        accumulated_time = 0
         while not stop_control_thread:
             current_start_time = time.time()
             theta_int += (current_start_time - previous_start_time) * get_avg_position()
+            accumulated_time += current_start_time - previous_start_time
 
             params = np.hstack((np.ravel(Kx[0, :]), Ki))
-            x = np.array([get_avg_position(), get_gyro_angle(), get_speed(), get_gyro_angular_velocity(), theta_int])
-            logging.info(f"[pos, angle, speed, ang_vel, theta_int] =  {x}")
+            x = np.array([-get_avg_position(), get_gyro_angle(), -get_speed(), get_gyro_angular_velocity(), -theta_int])
+            #logging.info(f"[pos, angle, speed, ang_vel, theta_int, time] =  {x} {accumulated_time}")
+            global output_data
+            output_data = np.vstack([output_data, np.hstack([x, accumulated_time])])
             engine_speed = np.dot(params, x)
             engine_percent_gain = 100 / 9
             engine_speed *= engine_percent_gain
@@ -99,7 +104,7 @@ def main():
     engine_stop()
 
     with open("output", "w") as f:
-        f.write(log_stream.getvalue())
+        np.save("output_data", output_data)
 
 
 def engine_stop():
