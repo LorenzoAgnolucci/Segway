@@ -113,18 +113,17 @@ void control_loop() {
 
         std::stringstream cur_data;
         cur_data << "[position, angle, speed, rate, theta_int, power, error, ang_ref, duty] = ["
-                 << engine_position << " "
-                 << gyro_angle << " "
-                 << motor_speed << " "
-                 << gyro_rate << " "
-                 << theta_int << " "
-                 << engine_speed << " "
-                 << motor_angle_error << " "
-                 << angular_speed_reference << " "
-                 << duty_cycle_target_speed
-                 << "] "
+                 << engine_position << ", "
+                 << gyro_angle << ", "
+                 << motor_speed << ", "
+                 << gyro_rate << ", "
+                 << theta_int << ", "
+                 << engine_speed << ", "
+                 << motor_angle_error << ", "
+                 << angular_speed_reference << ", "
+                 << duty_cycle_target_speed << ", "
                  //<< "t: [ms] " << duration_cast<milliseconds>(current_start_time - previous_start_time).count();
-                 << "accum: " << accumulated_time;
+                 << accumulated_time << "]";
         data.push_back(cur_data.str());
 
         motor_dx.set_duty_cycle_sp(clamp(engine_speed - steering, -100., 100.));
@@ -139,21 +138,80 @@ void control_loop() {
     }
 
     int engine_speed = 50;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10*2; i++) {
         auto current_start_time = high_resolution_clock::now();
+
+        int cycle_duration = duration_cast<milliseconds>(current_start_time - previous_start_time).count();
+        timestamps.push_back(cycle_duration);
+        accumulated_time += cycle_duration;
+
+        double engine_position = get_avg_position(motor_dx, motor_sx);
+        double gyro_angle = get_gyro_angle(gyro);
+        double motor_speed = get_speed(motor_dx, motor_sx);
+        double gyro_rate = get_gyro_rate(gyro);
+
+        auto angular_speed_reference = duty_cycle_target_speed * DUTY_RADIANS_CONVERSION_RATE;
+        motor_angle_reference += angular_speed_reference * cycle_duration / 1000;
+        auto motor_angle_error = engine_position - motor_angle_reference;
+
+        std::stringstream cur_data;
+        cur_data << "[position, angle, speed, rate, theta_int, power, error, ang_ref, duty] = ["
+                 << engine_position << ", "
+                 << gyro_angle << ", "
+                 << motor_speed << ", "
+                 << gyro_rate << ", "
+                 << theta_int << ", "
+                 << engine_speed << ", "
+                 << motor_angle_error << ", "
+                 << angular_speed_reference << ", "
+                 << duty_cycle_target_speed << ", "
+                 //<< "t: [ms] " << duration_cast<milliseconds>(current_start_time - previous_start_time).count();
+                 << accumulated_time << "]";
+        data.push_back(cur_data.str());
 
         motor_dx.set_duty_cycle_sp(engine_speed);
         motor_sx.set_duty_cycle_sp(engine_speed);
-
-        while (high_resolution_clock::now() - current_start_time < SAMPLING_TIME) {
-            std::this_thread::sleep_for(microseconds(100));
-        }
+        previous_start_time = current_start_time;
     }
 
     steering = 0;
     duty_cycle_target_speed = 0;
     motor_dx.set_duty_cycle_sp(0);
     motor_sx.set_duty_cycle_sp(0);
+
+    for (int i = 0; i < 15*40; i++) {
+        auto current_start_time = high_resolution_clock::now();
+
+        int cycle_duration = duration_cast<milliseconds>(current_start_time - previous_start_time).count();
+        timestamps.push_back(cycle_duration);
+        accumulated_time += cycle_duration;
+
+        double engine_position = get_avg_position(motor_dx, motor_sx);
+        double gyro_angle = get_gyro_angle(gyro);
+        double motor_speed = get_speed(motor_dx, motor_sx);
+        double gyro_rate = get_gyro_rate(gyro);
+
+        auto angular_speed_reference = duty_cycle_target_speed * DUTY_RADIANS_CONVERSION_RATE;
+        motor_angle_reference += angular_speed_reference * cycle_duration / 1000;
+        auto motor_angle_error = engine_position - motor_angle_reference;
+
+        std::stringstream cur_data;
+        cur_data << "[position, angle, speed, rate, theta_int, power, error, ang_ref, duty] = ["
+                 << engine_position << ", "
+                 << gyro_angle << ", "
+                 << motor_speed << ", "
+                 << gyro_rate << ", "
+                 << theta_int << ", "
+                 << "-1" << ", "
+                 << motor_angle_error << ", "
+                 << angular_speed_reference << ", "
+                 << duty_cycle_target_speed << ", "
+                 //<< "t: [ms] " << duration_cast<milliseconds>(current_start_time - previous_start_time).count();
+                 << accumulated_time << "]";
+        data.push_back(cur_data.str());
+
+        previous_start_time = current_start_time;
+    }
 
     for (const auto &s : data) {
         std::cout << s << std::endl;
@@ -207,7 +265,6 @@ int main() {
     }
 
     std::cout << "Ended" << std::endl;
-    std::this_thread::sleep_for(seconds(5));
     std::cout << "---" << std::endl;
 }
 
