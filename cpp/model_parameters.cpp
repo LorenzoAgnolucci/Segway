@@ -1,7 +1,7 @@
 #include "model_parameters.h"
 #include "utils.h"
 
-double degrees = -8.7;
+double degrees = -14;
 double cond_i = deg2rad(degrees);
 double k_pos = -0.8559;
 double k_angle = -44.7896;
