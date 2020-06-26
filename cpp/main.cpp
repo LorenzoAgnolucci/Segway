@@ -59,7 +59,7 @@ void handler(int sig) {
 }
 
 void control_loop() {
-    std::cout << "Starting control loop..." << std::endl;
+    std::cout << "Starting control loop...\nGive commands (speed_ref=, steer_ref=) to control the robot.\n" << std::endl;
     pthread_t this_thread = pthread_self();
     struct sched_param params;
     params.sched_priority = sched_get_priority_max(SCHED_FIFO);
@@ -228,7 +228,7 @@ int main() {
     resource_guard motor_sx_guard([]() { motor_sx.set_duty_cycle_sp(0); });
     resource_guard kickstand_guard([]() { kickstand_down(); });
 
-    std::cout << "Started" << std::endl;
+    std::cout << "Connected\n" << std::endl;
 
     std::string line;
     std::getline(std::cin, line);
@@ -264,7 +264,7 @@ int main() {
         std::getline(std::cin, line);
     }
 
-    std::cout << "Ended" << std::endl;
+    std::cout << "\nEnded" << std::endl;
     std::cout << "---" << std::endl;
 }
 
