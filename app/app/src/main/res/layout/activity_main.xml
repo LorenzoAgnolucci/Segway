@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    
+    <data>
+        <variable
+            name="viewModel"
+            type="it.turboillegali.segwaycontrol.MainViewModel" />
+        <import type="it.turboillegali.segwaycontrol.LEGOState"/>
+        <import type="it.turboillegali.segwaycontrol.R" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
+
+        <SeekBar
+            android:id="@+id/speedSeekbar"
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:enabled="@{viewModel.currentState == LEGOState.Running}"
+            android:max="@integer/max_speed_seek"
+            android:min="@integer/min_speed_seek"
+            android:progress="@{viewModel.currentSpeed}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/speedText" />
+
+
+        <TextView
+            android:id="@+id/speedText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:text='@{"Speed: " + viewModel.currentSpeed}'
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="@+id/speedSeekbar"
+            app:layout_constraintTop_toBottomOf="@+id/steerSeekbar"
+            tools:text="Speed: 0" />
+
+        <Button
+            android:id="@+id/stopBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:enabled="@{viewModel.currentState == LEGOState.Running}"
+            android:onClick="onStopClick"
+            android:text="Stop"
+            app:layout_constraintBaseline_toBaselineOf="@+id/startBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/startBtn" />
+
+        <Button
+            android:id="@+id/connectBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:enabled='@{viewModel.currentState == LEGOState.Disconnected}'
+            android:onClick="onConnectClick"
+            android:text="Connect"
+            app:layout_constraintEnd_toStartOf="@+id/exitBtn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/startBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:enabled='@{viewModel.currentState == LEGOState.Connected || viewModel.currentState == LEGOState.Idle}'
+            android:onClick="onStartClick"
+            android:text="Start"
+            app:layout_constraintEnd_toStartOf="@+id/stopBtn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/connectBtn" />
+
+        <Button
+            android:id="@+id/exitBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:enabled="@{viewModel.currentState == LEGOState.Connected || viewModel.currentState == LEGOState.Idle}"
+            android:onClick="onExitClick"
+            android:text="Exit"
+            app:layout_constraintBaseline_toBaselineOf="@+id/connectBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/connectBtn" />
+
+        <TextView
+            android:id="@+id/steerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="32dp"
+            android:text='@{"Steer:  " + viewModel.currentSteer}'
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="@+id/steerSeekbar"
+            app:layout_constraintTop_toBottomOf="@+id/startBtn"
+            tools:text="Steer: 0" />
+
+        <SeekBar
+            android:id="@+id/steerSeekbar"
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:max="@integer/max_steer_seek"
+            android:min="@integer/min_steer_seek"
+            android:enabled="@{viewModel.currentState == LEGOState.Running}"
+            android:progress="@{viewModel.currentSteer}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/steerText" />
+
+        <com.jmedeisis.bugstick.Joystick
+            android:id="@+id/joystick"
+            android:layout_width="@dimen/base_size"
+            android:layout_height="@dimen/base_size"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/bg_base"
+            android:enabled="@{viewModel.currentState == LEGOState.Running}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/speedSeekbar">
+
+            <Button
+                android:layout_width="@dimen/stick_size"
+                android:layout_height="@dimen/stick_size"
+                android:enabled="@{viewModel.currentState == LEGOState.Running}"
+                android:elevation="16dp"
+                android:stateListAnimator="@null"
+                android:background="@drawable/bg_stick" />
+
+        </com.jmedeisis.bugstick.Joystick>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

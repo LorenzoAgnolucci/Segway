@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="max_speed_seek">30</integer>
+    <integer name="min_speed_seek">-30</integer>
+    <integer name="max_steer_seek">26</integer>
+    <integer name="min_steer_seek">-26</integer>
+</resources>
