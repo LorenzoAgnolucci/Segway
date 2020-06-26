@@ -77,12 +77,26 @@ void control_loop() {
 
     double motor_angle_reference = 0;
     int stop_stabilize_counter = 0;
+    int actual_duty_cycle_target_speed = duty_cycle_target_speed;
+    int last_duty_cycle_target_speed = duty_cycle_target_speed;
+    int smoothing_target_speed_counter = 0;
 
     while (stop_stabilize_counter < 5 * initial_duty_cycle_target_speed + 20) {
         if (stop_control_thread) {
             stop_stabilize_counter++;
             duty_cycle_target_speed -= sign(duty_cycle_target_speed) * (stop_stabilize_counter % 5 == 0);
             steering -= sign(steering) * (stop_stabilize_counter % 5 == 0);
+        } else if (duty_cycle_target_speed != actual_duty_cycle_target_speed) {
+            if (last_duty_cycle_target_speed == duty_cycle_target_speed) {
+                smoothing_target_speed_counter++;
+
+                if (smoothing_target_speed_counter % 5 == 0) {
+                    actual_duty_cycle_target_speed += sign(duty_cycle_target_speed - actual_duty_cycle_target_speed);
+                }
+            } else {
+                last_duty_cycle_target_speed = duty_cycle_target_speed;
+                smoothing_target_speed_counter = 0;
+            }
         }
 
         auto current_start_time = high_resolution_clock::now();
@@ -96,7 +110,7 @@ void control_loop() {
         timestamps.push_back(cycle_duration);
         accumulated_time += cycle_duration;
 
-        auto angular_speed_reference = duty_cycle_target_speed * DUTY_RADIANS_CONVERSION_RATE;
+        auto angular_speed_reference = actual_duty_cycle_target_speed * DUTY_RADIANS_CONVERSION_RATE;
         motor_angle_reference += angular_speed_reference * cycle_duration / 1000;
         auto motor_angle_error = engine_position - motor_angle_reference;
         auto motor_angular_speed_error = motor_speed - angular_speed_reference;
@@ -121,7 +135,7 @@ void control_loop() {
                  << engine_speed << ", "
                  << motor_angle_error << ", "
                  << angular_speed_reference << ", "
-                 << duty_cycle_target_speed << ", "
+                 << actual_duty_cycle_target_speed << ", "
                  //<< "t: [ms] " << duration_cast<milliseconds>(current_start_time - previous_start_time).count();
                  << accumulated_time << "]";
         data.push_back(cur_data.str());
