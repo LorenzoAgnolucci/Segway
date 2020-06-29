@@ -14,7 +14,7 @@
 
 ## About The Project
 
-![EasyControl logo](https://gitlab.com/turboillegali/segway/-/blob/master/media/logo_large.png)
+![EasyControl logo](media/logo_large.png)
 
 
 In ```Segway``` we implement a control system that stabilize the robot in its
