@@ -65,6 +65,8 @@ Here's a brief description of each directory in the repo root:
 * ```python```: contains both the Python implementations of the control model
 * ```cpp```: contains the C++ implementation of the extended control model
 * ```app```: contains all the sources of ```EasyControl```
+* ```media```: contains app logo and video demos
+
 
 ## Authors
 
